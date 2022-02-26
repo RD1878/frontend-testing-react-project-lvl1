@@ -1,0 +1,42 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "Testing project 1",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "npx jest --bail"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RD1878/frontend-testing-react-project-lvl1.git"
+  },
+  "author": "Pavel khokhlov",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/RD1878/frontend-testing-react-project-lvl1/issues"
+  },
+  "homepage": "https://github.com/RD1878/frontend-testing-react-project-lvl1#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.5",
+    "@babel/node": "^7.16.8",
+    "@babel/preset-env": "^7.16.11",
+    "@jest/globals": "^27.5.1",
+    "babel-jest": "^27.5.1",
+    "eslint": "^8.10.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^26.1.1",
+    "fs": "^0.0.1-security",
+    "jest": "^27.5.1",
+    "jest-cli": "^27.5.1",
+    "nock": "^13.2.4",
+    "os": "^0.1.2",
+    "path": "^0.12.7"
+  },
+  "dependencies": {
+    "axios": "^0.26.0",
+    "commander": "^9.0.0"
+  }
+}
