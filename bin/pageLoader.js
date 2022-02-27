@@ -7,8 +7,8 @@ program
   .version('1.0.0')
   .description('Page download')
   .option('-o, --output', 'output directory', 'src')
-  .arguments('<url> <dirPath>')
-  .action((url, dirPath) => {
-    console.log(pageLoader(url, dirPath));
+  .arguments('<url> [dirPath]')
+  .action(async (url, dirPath) => {
+    console.log(await pageLoader(url, dirPath));
   })
   .parse(process.argv);
