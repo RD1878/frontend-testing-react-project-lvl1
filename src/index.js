@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
-import getFormattedFilename from './utils/getFormattedFileName.js';
+import convertUrl from './utils/convertUrl.js';
 
 export default async (url, dirPath = '.') => {
   try {
@@ -10,7 +10,7 @@ export default async (url, dirPath = '.') => {
       if (!fs.existsSync(dirPath)) {
         await fs.promises.mkdir(dirPath);
       }
-      const fileName = getFormattedFilename(url);
+      const fileName = `${convertUrl(url)}.html`;
       const resultPath = path.join(dirPath, fileName);
       await fs.promises.writeFile(resultPath, response.data);
       return resultPath;

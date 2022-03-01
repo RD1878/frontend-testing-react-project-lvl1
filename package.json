@@ -24,6 +24,7 @@
     "@babel/preset-env": "^7.16.11",
     "@jest/globals": "^27.5.1",
     "babel-jest": "^27.5.1",
+    "cheerio": "^1.0.0-rc.10",
     "eslint": "^8.10.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.4",
