@@ -17,6 +17,9 @@
     "url": "https://github.com/RD1878/frontend-testing-react-project-lvl1/issues"
   },
   "homepage": "https://github.com/RD1878/frontend-testing-react-project-lvl1#readme",
+  "bin": {
+    "pageLoader": "bin/pageLoader.js"
+  },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
     "@babel/core": "^7.17.5",
