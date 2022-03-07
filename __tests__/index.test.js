@@ -7,9 +7,9 @@ import pageLoader from '../src/index.js';
 
 const getFixturePath = (name) => path.join('__tests__', '__fixtures__', name);
 
-const baseUrl = 'https://web.ru.page';
-const uri = '/downloaded';
-const expectedFilename = 'web-ru-page-downloaded.html';
+const baseUrl = 'https://ru.hexlet.io';
+const uri = '/courses';
+const expectedFilename = 'ru-hexlet-io-courses.html';
 const responseFileName = 'responsePage.html';
 const savedFileName = 'savedPage.html';
 
@@ -17,10 +17,11 @@ let dirPath = '';
 let url = '';
 let expectedFilePath = '';
 let expectedFile;
+const expectedImageFilesSources = [];
+const expectedNamesImageFiles = [];
+
 let responseFile;
-const expectedFilesSrc = [];
-const responseFilesSrc = [];
-const expectedImageFiles = [];
+const responseImageFilesSources = [];
 
 beforeAll(async () => {
   url = `${baseUrl}${uri}`;
@@ -29,14 +30,14 @@ beforeAll(async () => {
 
   const $expectedPage = cheerio.load(expectedFile);
   $expectedPage('img').each((function (i) {
-    expectedFilesSrc[i] = $expectedPage(this).attr('src');
+    expectedImageFilesSources[i] = $expectedPage(this).attr('src');
     // eslint-disable-next-line prefer-destructuring
-    expectedImageFiles[i] = $expectedPage(this).attr('src').split('/')[1];
+    expectedNamesImageFiles[i] = $expectedPage(this).attr('src').split('/')[1];
   }));
 
   const $responsePage = cheerio.load(responseFile);
   $responsePage('img').each((function (i) {
-    responseFilesSrc[i] = $responsePage(this).attr('src');
+    responseImageFilesSources[i] = $responsePage(this).attr('src');
   }));
 });
 
@@ -62,7 +63,7 @@ test('checkDownloadedImages', async () => {
   nock(baseUrl)
     .get(uri)
     .reply(200, responseFile);
-  responseFilesSrc.forEach((src) => {
+  responseImageFilesSources.forEach((src) => {
     nock(baseUrl)
       .get(src)
       .reply(200);
@@ -72,13 +73,13 @@ test('checkDownloadedImages', async () => {
   const actualHtmlFile = actualFiles.find((file) => file.match(/.html$/));
   const actualHtmlPath = path.join(dirPath, actualHtmlFile);
   const actualDirPathOfFiles = `${actualHtmlPath.slice(0, -5)}_files`;
-  const actualImageFiles = await fs.promises.readdir(actualDirPathOfFiles);
+  const actualNamesImageFiles = await fs.promises.readdir(actualDirPathOfFiles);
   const actualHtmlContent = await fs.promises.readFile(actualHtmlPath, { encoding: 'utf-8' });
   const $actualPage = cheerio.load(actualHtmlContent);
-  const actualFilesSrc = [];
+  const actualImageFilesSources = [];
   $actualPage('img').each((function (i) {
-    actualFilesSrc[i] = $actualPage(this).attr('src');
+    actualImageFilesSources[i] = $actualPage(this).attr('src');
   }));
-  expect(actualFilesSrc).toEqual(expectedFilesSrc);
-  expect(actualImageFiles).toEqual(expectedImageFiles);
+  expect(actualImageFilesSources).toEqual(expectedImageFilesSources);
+  expect(actualNamesImageFiles).toEqual(expectedNamesImageFiles);
 });
