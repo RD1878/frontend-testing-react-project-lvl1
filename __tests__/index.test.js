@@ -23,36 +23,23 @@ const getScopes = (sources, baseUrl) => {
     }
   });
 };
-const setExpectedSourcesData = (file, selector, attr, arraySources, arrayFilenames, baseUrl) => {
+const setExpectedSourcesData = (file, selector, arraySources, arrayFilenames, baseUrl) => {
   const $ = cheerio.load(file);
   $(selector).each((function (i) {
-    const source = $(this).attr(attr);
-    if (!isValidHttpUrl(source)
-      || (isValidHttpUrl(source) && getOriginFromUrl(source) === baseUrl)) {
-      // eslint-disable-next-line no-param-reassign
-      arraySources[i] = source;
-      // eslint-disable-next-line prefer-destructuring,no-param-reassign
-      arrayFilenames[i] = source.split('/')[1];
-    }
+    const source = $(this).attr(selector === 'link' ? 'href' : 'src');
+    const isInValidSource = isValidHttpUrl(source) && getOriginFromUrl(source) !== baseUrl;
+    // eslint-disable-next-line no-param-reassign
+    arraySources[i] = source;
+    // eslint-disable-next-line prefer-destructuring,no-param-reassign
+    arrayFilenames[i] = !isInValidSource ? source.split('/')[1] : '';
   }));
 };
 
-const setResponseSourcesData = (file, selector, arraySources, attr) => {
+const setHtmlSources = (file, selector, arraySources) => {
   const $ = cheerio.load(file);
   $(selector).each((function (i) {
     // eslint-disable-next-line no-param-reassign
-    arraySources[i] = $(this).attr(attr);
-  }));
-};
-
-const setActualSourcesData = (file, selector, attr, arraySources) => {
-  const $ = cheerio.load(file);
-  $(selector).each((function (i) {
-    const source = $(this).attr(attr);
-    if (!isValidHttpUrl(source)) {
-      // eslint-disable-next-line no-param-reassign
-      arraySources[i] = source;
-    }
+    arraySources[i] = $(this).attr(selector === 'link' ? 'href' : 'src');
   }));
 };
 
@@ -84,13 +71,13 @@ beforeAll(async () => {
   responseFile = await fs.promises.readFile(getFixturePath(responseFileName), 'utf-8');
   expectedFile = await fs.promises.readFile(getFixturePath(savedFileName), 'utf-8');
 
-  setExpectedSourcesData(expectedFile, 'img', 'src', expectedImagesSources, expectedNamesImageFiles, baseUrl);
-  setExpectedSourcesData(expectedFile, 'link', 'href', expectedLinksSources, expectedNamesLinkFiles, baseUrl);
-  setExpectedSourcesData(expectedFile, 'script', 'src', expectedScriptsSources, expectedNamesScriptFiles, baseUrl);
+  setExpectedSourcesData(expectedFile, 'img', expectedImagesSources, expectedNamesImageFiles, baseUrl);
+  setExpectedSourcesData(expectedFile, 'link', expectedLinksSources, expectedNamesLinkFiles, baseUrl);
+  setExpectedSourcesData(expectedFile, 'script', expectedScriptsSources, expectedNamesScriptFiles, baseUrl);
 
-  setResponseSourcesData(responseFile, 'img', responseImagesSources, 'src');
-  setResponseSourcesData(responseFile, 'link', responseLinksSources, 'href');
-  setResponseSourcesData(responseFile, 'script', responseScriptsSources, 'src');
+  setHtmlSources(responseFile, 'img', responseImagesSources);
+  setHtmlSources(responseFile, 'link', responseLinksSources);
+  setHtmlSources(responseFile, 'script', responseScriptsSources);
 });
 
 beforeEach(async () => {
@@ -127,24 +114,35 @@ test('checkDownloadedFiles', async () => {
   const actualHtmlFilePath = path.join(dirPath, actualHtmlFile);
   const actualDirPathOfFiles = `${actualHtmlFilePath.slice(0, -5)}_files`;
   const actualNamesFiles = await fs.promises.readdir(actualDirPathOfFiles);
-  const actualNamesImageFiles = actualNamesFiles.filter((file) => file.slice(-3) === 'png' || 'jpg');
-  const actualNamesLinkFiles = actualNamesFiles.filter((file) => file.slice(-3) === 'css');
+  const actualNamesImageFiles = actualNamesFiles.filter((file) => {
+    const ext = file.slice(-3);
+    return ext === 'png' || ext === 'jpg';
+  });
   const actualNamesScriptFiles = actualNamesFiles.filter((file) => file.slice(-2) === 'js');
+  const actualNamesLinkFiles = actualNamesFiles.filter(
+    (file) => !actualNamesImageFiles.includes(file)
+    && !actualNamesScriptFiles.includes(file),
+  );
+
   const actualHtmlContent = await fs.promises.readFile(actualHtmlFilePath, { encoding: 'utf-8' });
 
   const actualImagesSources = [];
   const actualLinksSources = [];
   const actualScriptSources = [];
 
-  setActualSourcesData(actualHtmlContent, 'img', 'src', actualImagesSources);
-  setActualSourcesData(actualHtmlContent, 'link', 'href', actualLinksSources);
-  setActualSourcesData(actualHtmlContent, 'script', 'src', actualScriptSources);
+  setHtmlSources(actualHtmlContent, 'img', actualImagesSources);
+  setHtmlSources(actualHtmlContent, 'link', actualLinksSources);
+  setHtmlSources(actualHtmlContent, 'script', actualScriptSources);
+
+  const filtredExpectedNamesImageFiles = expectedNamesImageFiles.filter((item) => item);
+  const filtredExpectedNamesLinkFiles = expectedNamesLinkFiles.filter((item) => item);
+  const filtredExpectedNamesScriptFiles = expectedNamesScriptFiles.filter((item) => item);
 
   expect(actualImagesSources).toEqual(expectedImagesSources);
   expect(actualLinksSources).toEqual(expectedLinksSources);
   expect(actualScriptSources).toEqual(expectedScriptsSources);
 
-  expect(actualNamesImageFiles).toEqual(expectedNamesImageFiles);
-  expect(actualNamesLinkFiles).toEqual(expectedNamesLinkFiles);
-  expect(actualNamesScriptFiles).toEqual(expectedNamesScriptFiles);
+  expect(actualNamesImageFiles).toEqual(filtredExpectedNamesImageFiles);
+  expect(actualNamesLinkFiles).toEqual(filtredExpectedNamesLinkFiles);
+  expect(actualNamesScriptFiles).toEqual(filtredExpectedNamesScriptFiles);
 });

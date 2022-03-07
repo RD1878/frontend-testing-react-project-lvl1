@@ -1,4 +1,7 @@
 const isValidHttpUrl = (string) => {
+  if (!string) {
+    return false;
+  }
   let url;
 
   try {

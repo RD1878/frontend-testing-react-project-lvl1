@@ -1,3 +1,8 @@
-const formatPath = (path) => path.replace(/\W/g, '-');
+const formatPath = (path) => {
+  if (path === '/') {
+    return '';
+  }
+  return path.replace(/\W/g, '-');
+};
 
 export default formatPath;
