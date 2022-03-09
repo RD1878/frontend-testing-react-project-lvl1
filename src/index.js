@@ -2,11 +2,17 @@ import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
 import cheerio from 'cheerio';
+import debug from 'debug';
+import 'axios-debug-log';
 import convertUrl from './utils/convertUrl.js';
 import getPathFromUrl from './utils/getPathFromUrl.js';
 import formatPath from './utils/formatPath.js';
 import getOriginFromUrl from './utils/getOriginFromUrl.js';
 import isValidHttpUrl from './utils/isValidHttpUrl.js';
+
+const appName = 'pageLoader';
+const log = debug(appName);
+log('debugging %o', appName);
 
 const saveFile = async (source, url, filePath) => {
   const res = await axios({
@@ -21,6 +27,9 @@ const saveFile = async (source, url, filePath) => {
 export default async (url, dirPath) => {
   try {
     const response = await axios.get(url);
+    log('Request URL:', response.config.url);
+    log('Request method:', response.request.method);
+    log('Response status:', response.status);
     const formattedDirPath = dirPath === '/app' ? `./${dirPath}` : dirPath;
     if (response.status === 200) {
       if (!fs.existsSync(formattedDirPath)) {
@@ -55,6 +64,7 @@ export default async (url, dirPath) => {
         const formattedSrc = `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension}`;
         const filePath = fs.createWriteStream(path.join(formattedDirPath, formattedSrc));
         saveFile(source, url, filePath);
+        log('File downloaded to:', filePath.path);
 
         return $(this).attr('src', formattedSrc);
       });
@@ -71,6 +81,7 @@ export default async (url, dirPath) => {
         const formattedSrc = `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension ?? 'html'}`;
         const filePath = fs.createWriteStream(path.join(formattedDirPath, formattedSrc));
         saveFile(source, url, filePath);
+        log('File downloaded to:', filePath.path);
 
         return $(this).attr('href', formattedSrc);
       });
@@ -86,12 +97,14 @@ export default async (url, dirPath) => {
         const formattedSrc = `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension}`;
         const filePath = fs.createWriteStream(path.join(formattedDirPath, formattedSrc));
         saveFile(source, url, filePath);
+        log('File downloaded to:', filePath.path);
 
         return $(this).attr('src', formattedSrc);
       });
 
       const resultHtml = $.html();
       await fs.promises.writeFile(htmlPath, resultHtml);
+      log('Page saved to:', htmlPath);
       return htmlPath;
     }
     return 'Error';

@@ -4,7 +4,8 @@
   "description": "Testing project 1",
   "main": "src/index.js",
   "scripts": {
-    "test": "npx jest --bail"
+    "test": "npx jest --bail",
+    "test:debug": "DEBUG=nock.* npx jest"
   },
   "repository": {
     "type": "git",
@@ -40,7 +41,9 @@
   },
   "dependencies": {
     "axios": "^0.26.0",
+    "axios-debug-log": "^0.8.4",
     "cheerio": "^1.0.0-rc.10",
-    "commander": "^9.0.0"
+    "commander": "^9.0.0",
+    "debug": "^4.3.3"
   }
 }
