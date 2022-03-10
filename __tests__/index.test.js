@@ -146,3 +146,17 @@ test('checkDownloadedFiles', async () => {
   expect(actualNamesLinkFiles).toEqual(filtredExpectedNamesLinkFiles);
   expect(actualNamesScriptFiles).toEqual(filtredExpectedNamesScriptFiles);
 });
+
+test('check with request error', async () => {
+  const responseCode = 404;
+  nock(baseUrl)
+    .get(uri)
+    .reply(responseCode);
+  await expect(pageLoader(url, dirPath)).rejects.toThrow(`
+      ERROR
+      Message: Request failed with status code ${responseCode};
+      Code: undefined;
+      URL: ${baseUrl}${uri};
+      Response code: ${responseCode}
+      `);
+});

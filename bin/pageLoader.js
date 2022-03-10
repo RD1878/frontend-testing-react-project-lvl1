@@ -10,6 +10,12 @@ program
   .argument('<url>')
   .argument('[dirPath]', '', '/app')
   .action(async (url, dirPath) => {
-    console.log(await pageLoader(url, dirPath));
+    try {
+      const result = await pageLoader(url, dirPath);
+      console.log(result);
+    } catch ({ message }) {
+      console.error(message);
+      process.exit(1);
+    }
   })
   .parse(process.argv);

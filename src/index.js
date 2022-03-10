@@ -107,9 +107,18 @@ export default async (url, dirPath) => {
       log('Page saved to:', htmlPath);
       return htmlPath;
     }
-    return 'Error';
   } catch (e) {
-    console.log(e);
-    return 'Error';
+    const {
+      code, response, config, message,
+    } = e;
+    throw new Error(
+      `
+      ERROR
+      Message: ${message};
+      Code: ${code};
+      URL: ${config?.url};
+      Response code: ${response?.status}
+      `,
+    );
   }
 };
