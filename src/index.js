@@ -30,7 +30,7 @@ export default async (url, dirPath) => {
     log('Request URL:', response.config.url);
     log('Request method:', response.request.method);
     log('Response status:', response.status);
-    const formattedDirPath = dirPath === '/app' ? `./${dirPath}` : dirPath;
+    const formattedDirPath = dirPath === '/app' ? `.${dirPath}` : dirPath;
     if (response.status === 200) {
       if (!fs.existsSync(formattedDirPath)) {
         await fs.promises.mkdir(formattedDirPath);

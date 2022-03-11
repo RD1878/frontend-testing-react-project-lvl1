@@ -6,12 +6,11 @@ import pageLoader from '../src/index.js';
 program
   .version('1.0.0')
   .description('Page download')
-  .option('-o, --output', 'output directory', '/app')
+  .option('-o, --output [dirPath]', 'output directory', '/app')
   .argument('<url>')
-  .argument('[dirPath]', '', '/app')
   .action(async (url, dirPath) => {
     try {
-      const result = await pageLoader(url, dirPath);
+      const result = await pageLoader(url, dirPath.output);
       console.log(result);
     } catch ({ message }) {
       console.error(message);
