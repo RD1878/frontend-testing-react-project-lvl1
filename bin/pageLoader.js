@@ -6,7 +6,7 @@ import pageLoader from '../src/index.js';
 program
   .version('1.0.0')
   .description('Page download')
-  .option('-o, --output [dirPath]', 'output directory', '/app')
+  .option('-o, --output [dirPath]', 'output directory', './')
   .argument('<url>')
   .action(async (url, dirPath) => {
     try {

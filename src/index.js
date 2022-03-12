@@ -30,21 +30,20 @@ export default async (url, dirPath) => {
     log('Request URL:', response.config.url);
     log('Request method:', response.request.method);
     log('Response status:', response.status);
-    const formattedDirPath = dirPath === '/app' ? `.${dirPath}` : dirPath;
     if (response.status === 200) {
-      if (!fs.existsSync(formattedDirPath)) {
-        await fs.promises.mkdir(formattedDirPath);
+      if (!fs.existsSync(dirPath)) {
+        await fs.promises.mkdir(dirPath, { recursive: true });
       }
 
       const htmlFileName = `${convertUrl(url)}.html`;
       const filesDirectoryName = `${convertUrl(url)}_files`;
-      const filesPath = path.join(formattedDirPath, filesDirectoryName);
+      const filesPath = path.join(dirPath, filesDirectoryName);
 
       if (!fs.existsSync(filesPath)) {
         await fs.promises.mkdir(filesPath);
       }
 
-      const htmlPath = path.join(formattedDirPath, htmlFileName);
+      const htmlPath = path.join(dirPath, htmlFileName);
       const originOfUrl = getOriginFromUrl(url);
 
       const $ = cheerio.load(response.data);
@@ -57,12 +56,8 @@ export default async (url, dirPath) => {
 
         const [value, extension] = getPathFromUrl(source).split('.');
 
-        /*if (extension !== 'png' && extension !== 'img') {
-          return $(this).attr('src', source);
-        }*/
-
         const formattedSrc = `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension}`;
-        const filePath = fs.createWriteStream(path.join(formattedDirPath, formattedSrc));
+        const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
         saveFile(source, url, filePath);
         log('File downloaded to:', filePath.path);
 
@@ -79,7 +74,7 @@ export default async (url, dirPath) => {
         const [value, extension] = getPathFromUrl(source).split('.');
 
         const formattedSrc = `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension ?? 'html'}`;
-        const filePath = fs.createWriteStream(path.join(formattedDirPath, formattedSrc));
+        const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
         saveFile(source, url, filePath);
         log('File downloaded to:', filePath.path);
 
@@ -95,7 +90,7 @@ export default async (url, dirPath) => {
         const [value, extension] = getPathFromUrl(source).split('.');
 
         const formattedSrc = `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension}`;
-        const filePath = fs.createWriteStream(path.join(formattedDirPath, formattedSrc));
+        const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
         saveFile(source, url, filePath);
         log('File downloaded to:', filePath.path);
 
