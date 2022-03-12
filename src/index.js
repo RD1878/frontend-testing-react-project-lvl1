@@ -57,9 +57,9 @@ export default async (url, dirPath) => {
 
         const [value, extension] = getPathFromUrl(source).split('.');
 
-        if (extension !== 'png' && extension !== 'img') {
+        /*if (extension !== 'png' && extension !== 'img') {
           return $(this).attr('src', source);
-        }
+        }*/
 
         const formattedSrc = `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension}`;
         const filePath = fs.createWriteStream(path.join(formattedDirPath, formattedSrc));
