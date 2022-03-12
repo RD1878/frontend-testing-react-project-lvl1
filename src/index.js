@@ -31,6 +31,7 @@ export default async (url, dirPath) => {
     log('Request method:', response.request.method);
     log('Response status:', response.status);
     if (response.status === 200) {
+      console.log(dirPath)
       if (!fs.existsSync(dirPath)) {
         await fs.promises.mkdir(dirPath, { recursive: true });
       }
@@ -38,6 +39,8 @@ export default async (url, dirPath) => {
       const htmlFileName = `${convertUrl(url)}.html`;
       const filesDirectoryName = `${convertUrl(url)}_files`;
       const filesPath = path.join(dirPath, filesDirectoryName);
+      console.log(filesPath);
+      console.log(filesDirectoryName);
 
       if (!fs.existsSync(filesPath)) {
         await fs.promises.mkdir(filesPath);
