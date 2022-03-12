@@ -105,7 +105,7 @@ export default async (url, dirPath) => {
       const resultHtml = $.html();
       await fs.promises.writeFile(htmlPath, resultHtml);
       log('Page saved to:', htmlPath);
-      return htmlPath;
+      return { filePath: htmlPath };
     }
   } catch (e) {
     const {
