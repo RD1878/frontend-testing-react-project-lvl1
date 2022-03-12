@@ -106,6 +106,7 @@ export default async (url, dirPath) => {
     const {
       code, response, config, message,
     } = e;
+    console.log(e);
     throw new Error(
       `
       ERROR
