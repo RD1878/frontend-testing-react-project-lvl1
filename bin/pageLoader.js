@@ -9,7 +9,6 @@ program
   .arguments('<url>')
   .option('-o, --output [dirPath]', 'output directory', './')
   .action((url) => {
-    // console.log(program);
     pageLoader(url, program.getOptionValue('output'))
       .then((outputDir) => console.log(outputDir))
       .catch(({ message }) => {

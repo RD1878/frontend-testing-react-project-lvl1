@@ -25,6 +25,7 @@ const saveFile = async (source, url, filePath) => {
 };
 
 export default async (url, dirPath) => {
+  console.log(dirPath);
   try {
     const response = await axios.get(url);
     log('Request URL:', response.config.url);
