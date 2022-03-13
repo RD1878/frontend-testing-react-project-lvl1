@@ -6,15 +6,15 @@ import pageLoader from '../src/index.js';
 program
   .version('1.0.0')
   .description('Page download')
+  .arguments('<url>')
   .option('-o, --output [dirPath]', 'output directory', './')
-  .argument('<url>')
-  .action(async (url, dirPath) => {
-    try {
-      const result = await pageLoader(url, dirPath.output);
-      console.log(result);
-    } catch ({ message }) {
-      console.error(message);
-      process.exit(1);
-    }
+  .action((url) => {
+    // console.log(program);
+    pageLoader(url, program.getOptionValue('output'))
+      .then((outputDir) => console.log(outputDir))
+      .catch(({ message }) => {
+        console.error(message);
+        process.exit(1);
+      });
   })
   .parse(process.argv);
