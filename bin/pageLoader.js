@@ -7,7 +7,7 @@ program
   .version('1.0.0')
   .description('Page download')
   .arguments('<url>')
-  .option('-o, --output [dirPath]', 'output directory', './')
+  .option('-o, --output [dirPath]', 'output directory', process.cwd())
   .action((url) => {
     pageLoader(url, program.getOptionValue('output'))
       .then((outputDir) => console.log(outputDir))
