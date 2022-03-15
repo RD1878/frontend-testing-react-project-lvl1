@@ -11,8 +11,9 @@ program
   .action((url) => {
     // console.log(program);
     console.log('url in bin', url);
-    console.log('path in bin', program.output);
-    pageLoader(url, program.output)
+    console.log('path in bin', program.getOptionValue('output'));
+    console.log('program', program);
+    pageLoader(url, program.getOptionValue('output'))
       .then((outputDir) => console.log(outputDir))
       .catch(({ message }) => {
         console.error(message);
