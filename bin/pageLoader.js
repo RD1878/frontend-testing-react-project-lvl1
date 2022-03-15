@@ -9,10 +9,10 @@ program
   .arguments('<url>')
   .option('-o, --output [dirPath]', 'output directory', process.cwd())
   .action((url) => {
-    console.log(program);
+    // console.log(program);
     console.log('url in bin', url);
-    console.log('path in bin', program.getOptionValue('output'));
-    pageLoader(url, program.getOptionValue('output'))
+    console.log('path in bin', program.output);
+    pageLoader(url, program.output)
       .then((outputDir) => console.log(outputDir))
       .catch(({ message }) => {
         console.error(message);
