@@ -8,7 +8,7 @@ import isValidHttpUrl from '../src/utils/isValidHttpUrl.js';
 import getOriginFromUrl from '../src/utils/getOriginFromUrl.js';
 import getPathFromUrl from '../src/utils/getPathFromUrl.js';
 
-const getFixturePath = (name) => path.join(__dirname, '__tests__', '__fixtures__', name);
+const getFixturePath = (name) => path.join('__tests__', '__fixtures__', name);
 const getScopes = (sources, baseUrl) => {
   sources.forEach((src) => {
     if (!isValidHttpUrl(src)) {
@@ -69,6 +69,7 @@ const responseScriptsSources = [];
 beforeAll(async () => {
   url = `${baseUrl}${uri}`;
   responseFile = await fs.promises.readFile(getFixturePath(responseFileName), 'utf-8');
+  console.log(responseFile);
   expectedFile = await fs.promises.readFile(getFixturePath(savedFileName), 'utf-8');
 
   setExpectedSourcesData(expectedFile, 'img', expectedImagesSources, expectedNamesImageFiles, baseUrl);
@@ -91,7 +92,6 @@ test('checkFileName', async () => {
   nock(baseUrl)
     .get(uri)
     .reply(200);
-  console.log(response)
   await pageLoader(url, dirPath);
   const actualFiles = await fs.promises.readdir(dirPath);
   const actualHtmlFile = actualFiles.find((file) => file.match(/.html$/));
