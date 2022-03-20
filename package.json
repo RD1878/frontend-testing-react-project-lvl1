@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/RD1878/frontend-testing-react-project-lvl1#readme",
   "bin": {
-    "pageLoader": "bin/page-loader.js"
+    "page-loader": "bin/page-loader.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
