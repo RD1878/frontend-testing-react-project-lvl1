@@ -16,13 +16,28 @@ const log = debug(appName);
 log('debugging %o', appName);
 
 const saveFile = async (source, url, filePath) => {
-  const res = await axios({
-    method: 'GET',
-    url: source,
-    baseURL: `${getOriginFromUrl(url)}`,
-    responseType: 'stream',
-  });
-  await res.data.pipe(filePath);
+  try {
+    const res = await axios({
+      method: 'GET',
+      url: source,
+      baseURL: `${getOriginFromUrl(url)}`,
+      responseType: 'stream',
+    });
+    await res.data.pipe(filePath);
+  } catch (e) {
+    const {
+      code, response, config, message,
+    } = e;
+    throw new Error(
+      `
+      ERROR
+      Message: ${message};
+      Code: ${code};
+      URL: ${config?.url};
+      Response code: ${response?.status}
+      `,
+    );
+  }
 };
 
 export default async (url, dirPath = cwd()) => {
@@ -67,11 +82,6 @@ export default async (url, dirPath = cwd()) => {
 
       $('link').map(function () {
         const source = $(this).attr('href');
-        console.log('originOfUrl', originOfUrl);
-        console.log('source', source);
-        console.log('isValidHttpUrl(source)', isValidHttpUrl(source));
-        console.log('getOriginFromUrl(source)', getOriginFromUrl(source));
-        console.log('source.match(/^\\/\\//))', source.match(/^\/\//));
 
         if (!source || (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
           return $(this).attr('href', source);
