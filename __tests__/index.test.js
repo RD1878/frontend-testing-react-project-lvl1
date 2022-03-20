@@ -8,7 +8,10 @@ import isValidHttpUrl from '../src/utils/isValidHttpUrl.js';
 import getOriginFromUrl from '../src/utils/getOriginFromUrl.js';
 import getPathFromUrl from '../src/utils/getPathFromUrl.js';
 
-const getFixturePath = (name) => path.join('__tests__', '__fixtures__', name);
+const getFixturePath = (name) => {
+  console.log('fixtures')
+  return path.join('__tests__', '__fixtures__', name);
+};
 const getScopes = (sources, baseUrl) => {
   sources.forEach((src) => {
     if (!isValidHttpUrl(src)) {
