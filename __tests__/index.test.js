@@ -69,7 +69,6 @@ const responseScriptsSources = [];
 beforeAll(async () => {
   url = `${baseUrl}${uri}`;
   responseFile = await fs.promises.readFile(getFixturePath(responseFileName), 'utf-8');
-  console.log(responseFile);
   expectedFile = await fs.promises.readFile(getFixturePath(savedFileName), 'utf-8');
 
   setExpectedSourcesData(expectedFile, 'img', expectedImagesSources, expectedNamesImageFiles, baseUrl);
@@ -96,6 +95,8 @@ test('checkFileName', async () => {
   const actualFiles = await fs.promises.readdir(dirPath);
   const actualHtmlFile = actualFiles.find((file) => file.match(/.html$/));
   const actualHtmlFilePath = path.join(dirPath, actualHtmlFile);
+  console.log(actualHtmlFilePath);
+  console.log(expectedHtmlFilePath);
   expect(actualHtmlFilePath).toEqual(expectedHtmlFilePath);
 });
 
