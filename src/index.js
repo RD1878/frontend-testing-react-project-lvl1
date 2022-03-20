@@ -67,6 +67,11 @@ export default async (url, dirPath = cwd()) => {
 
       $('link').map(function () {
         const source = $(this).attr('href');
+        console.log('originOfUrl', originOfUrl);
+        console.log('source', source);
+        console.log('isValidHttpUrl(source)', isValidHttpUrl(source));
+        console.log('getOriginFromUrl(source)', getOriginFromUrl(source));
+        console.log('source.match(/^\\/\\//))', source.match(/^\/\//)));
 
         if (!source || (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
           return $(this).attr('href', source);
