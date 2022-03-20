@@ -4,7 +4,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import debug from 'debug';
 import 'axios-debug-log';
-import {cwd} from 'process';
+import { cwd } from 'process';
 import convertUrl from './utils/convertUrl.js';
 import getPathFromUrl from './utils/getPathFromUrl.js';
 import formatPath from './utils/formatPath.js';
@@ -107,7 +107,7 @@ export default async (url, dirPath = cwd()) => {
     const {
       code, response, config, message,
     } = e;
-    console.log(e);
+    // console.log(e);
     throw new Error(
       `
       ERROR

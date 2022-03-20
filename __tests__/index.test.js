@@ -8,10 +8,7 @@ import isValidHttpUrl from '../src/utils/isValidHttpUrl.js';
 import getOriginFromUrl from '../src/utils/getOriginFromUrl.js';
 import getPathFromUrl from '../src/utils/getPathFromUrl.js';
 
-const getFixturePath = (name) => {
-  console.log('fixtures');
-  return path.join('__tests__', '__fixtures__', name);
-};
+const getFixturePath = (name) => path.join('__tests__', '__fixtures__', name);
 const getScopes = (sources, baseUrl) => {
   sources.forEach((src) => {
     if (!isValidHttpUrl(src)) {
@@ -52,9 +49,9 @@ const expectedFilename = 'ru-hexlet-io-courses.html';
 const responseFileName = 'responsePage.html';
 const savedFileName = 'savedPage.html';
 
-const dirPath = '';
-const url = '';
-const expectedHtmlFilePath = '';
+let dirPath = '';
+let url = '';
+let expectedHtmlFilePath = '';
 let expectedFile;
 const expectedImagesSources = [];
 const expectedLinksSources = [];
@@ -69,8 +66,7 @@ const responseImagesSources = [];
 const responseLinksSources = [];
 const responseScriptsSources = [];
 
-/* beforeAll(async () => {
-  console.log('1')
+beforeAll(async () => {
   url = `${baseUrl}${uri}`;
   responseFile = await fs.promises.readFile(getFixturePath(responseFileName), 'utf-8');
   expectedFile = await fs.promises.readFile(getFixturePath(savedFileName), 'utf-8');
@@ -85,7 +81,6 @@ const responseScriptsSources = [];
 });
 
 beforeEach(async () => {
-  console.log('2')
   dirPath = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
   expectedHtmlFilePath = path.join(dirPath, expectedFilename);
   const expectedFilesPath = `${expectedHtmlFilePath.slice(0, -5)}_files`;
@@ -93,7 +88,6 @@ beforeEach(async () => {
 });
 
 test('checkFileName', async () => {
-  console.log('3')
   nock(baseUrl)
     .get(uri)
     .reply(200);
@@ -101,13 +95,10 @@ test('checkFileName', async () => {
   const actualFiles = await fs.promises.readdir(dirPath);
   const actualHtmlFile = actualFiles.find((file) => file.match(/.html$/));
   const actualHtmlFilePath = path.join(dirPath, actualHtmlFile);
-  console.log(actualHtmlFilePath);
-  console.log(expectedHtmlFilePath);
   expect(actualHtmlFilePath).toEqual(expectedHtmlFilePath);
 });
 
 test('checkDownloadedFiles', async () => {
-  console.log('4')
   nock(baseUrl)
     .get(uri)
     .reply(200, responseFile);
@@ -157,7 +148,6 @@ test('checkDownloadedFiles', async () => {
 });
 
 test('check with request error', async () => {
-  console.log('5')
   const responseCode = 404;
   nock(baseUrl)
     .get(uri)
@@ -169,8 +159,4 @@ test('check with request error', async () => {
       URL: ${baseUrl}${uri};
       Response code: ${responseCode}
       `);
-}); */
-
-test('ok', () => {
-  expect('test').toEqual('test');
 });
