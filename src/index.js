@@ -51,7 +51,7 @@ export default async (url, dirPath = cwd()) => {
       $('img').map(function () {
         const source = $(this).attr('src');
 
-        if (isValidHttpUrl(source) && getOriginFromUrl(source) !== originOfUrl) {
+        if (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) {
           return $(this).attr('src', source);
         }
 
@@ -68,7 +68,7 @@ export default async (url, dirPath = cwd()) => {
       $('link').map(function () {
         const source = $(this).attr('href');
 
-        if (!source || (isValidHttpUrl(source) && getOriginFromUrl(source) !== originOfUrl) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
+        if (!source || (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
           return $(this).attr('href', source);
         }
 
@@ -84,7 +84,7 @@ export default async (url, dirPath = cwd()) => {
 
       $('script').map(function () {
         const source = $(this).attr('src');
-        if (!source || (isValidHttpUrl(source) && getOriginFromUrl(source) !== originOfUrl) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
+        if (!source || (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
           return $(this).attr('src', source);
         }
 
@@ -107,7 +107,6 @@ export default async (url, dirPath = cwd()) => {
     const {
       code, response, config, message,
     } = e;
-    // console.log(e);
     throw new Error(
       `
       ERROR
