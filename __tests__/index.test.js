@@ -67,6 +67,7 @@ const responseLinksSources = [];
 const responseScriptsSources = [];
 
 beforeAll(async () => {
+  console.log('1')
   url = `${baseUrl}${uri}`;
   responseFile = await fs.promises.readFile(getFixturePath(responseFileName), 'utf-8');
   expectedFile = await fs.promises.readFile(getFixturePath(savedFileName), 'utf-8');
@@ -81,6 +82,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  console.log('2')
   dirPath = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
   expectedHtmlFilePath = path.join(dirPath, expectedFilename);
   const expectedFilesPath = `${expectedHtmlFilePath.slice(0, -5)}_files`;
@@ -88,6 +90,7 @@ beforeEach(async () => {
 });
 
 test('checkFileName', async () => {
+  console.log('3')
   nock(baseUrl)
     .get(uri)
     .reply(200);
@@ -101,6 +104,7 @@ test('checkFileName', async () => {
 });
 
 test('checkDownloadedFiles', async () => {
+  console.log('4')
   nock(baseUrl)
     .get(uri)
     .reply(200, responseFile);
@@ -150,6 +154,7 @@ test('checkDownloadedFiles', async () => {
 });
 
 test('check with request error', async () => {
+  console.log('5')
   const responseCode = 404;
   nock(baseUrl)
     .get(uri)
