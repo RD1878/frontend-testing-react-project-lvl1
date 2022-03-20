@@ -4,6 +4,7 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import debug from 'debug';
 import 'axios-debug-log';
+import {cwd} from 'process';
 import convertUrl from './utils/convertUrl.js';
 import getPathFromUrl from './utils/getPathFromUrl.js';
 import formatPath from './utils/formatPath.js';
@@ -24,7 +25,7 @@ const saveFile = async (source, url, filePath) => {
   await res.data.pipe(filePath);
 };
 
-export default async (url, dirPath = '/') => {
+export default async (url, dirPath = cwd()) => {
   console.log(dirPath);
   try {
     const response = await axios.get(url);
