@@ -87,7 +87,7 @@ beforeEach(async () => {
   await fs.promises.mkdir(expectedFilesPath);
 });
 
-test('checkFileName', async () => {
+test('check filename', async () => {
   nock(baseUrl)
     .get(uri)
     .reply(200);
@@ -98,7 +98,7 @@ test('checkFileName', async () => {
   expect(actualHtmlFilePath).toEqual(expectedHtmlFilePath);
 });
 
-test('checkDownloadedFiles', async () => {
+test('check downloaded files', async () => {
   nock(baseUrl)
     .get(uri)
     .reply(200, responseFile);

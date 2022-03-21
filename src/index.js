@@ -40,6 +40,8 @@ const saveFile = async (source, url, filePath) => {
   }
 };
 
+const getFormattedSrc = (filesDirectoryName, url, value, extension) => `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension ?? 'html'}`;
+
 const pageLoaderFunc = async (url, dirPath = cwd()) => {
   try {
     const response = await axios.get(url);
@@ -72,7 +74,7 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
 
         const [value, extension] = getPathFromUrl(source).split('.');
 
-        const formattedSrc = `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension}`;
+        const formattedSrc = getFormattedSrc(filesDirectoryName, url, value, extension);
         const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
         saveFile(source, url, filePath);
         log('File downloaded to:', filePath.path);
@@ -89,7 +91,7 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
 
         const [value, extension] = getPathFromUrl(source).split('.');
 
-        const formattedSrc = `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension ?? 'html'}`;
+        const formattedSrc = getFormattedSrc(filesDirectoryName, url, value, extension);
         const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
         saveFile(source, url, filePath);
         log('File downloaded to:', filePath.path);
@@ -105,7 +107,7 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
 
         const [value, extension] = getPathFromUrl(source).split('.');
 
-        const formattedSrc = `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension}`;
+        const formattedSrc = getFormattedSrc(filesDirectoryName, url, value, extension);
         const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
         saveFile(source, url, filePath);
         log('File downloaded to:', filePath.path);
