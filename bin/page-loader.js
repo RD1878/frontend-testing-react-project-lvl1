@@ -12,8 +12,7 @@ program
     pageLoader(url, program.getOptionValue('output'))
       .then((outputDir) => console.log(outputDir))
       .catch((error) => {
-        // console.log(error);
-        // console.error(error.message);
+        console.error(error.message);
         process.exit(1);
       });
   })

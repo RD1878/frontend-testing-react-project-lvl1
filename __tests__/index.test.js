@@ -137,9 +137,6 @@ test('checkDownloadedFiles', async () => {
   const filtredExpectedNamesImageFiles = expectedNamesImageFiles.filter((item) => item);
   const filtredExpectedNamesLinkFiles = expectedNamesLinkFiles.filter((item) => item);
   const filtredExpectedNamesScriptFiles = expectedNamesScriptFiles.filter((item) => item);
-  // console.log('actualHtmlContent', actualHtmlContent);
-  // onsole.log('actualLinksSources', actualLinksSources);
-  // console.log('expectedLinksSources', expectedLinksSources);
   expect(actualImagesSources).toEqual(expectedImagesSources);
   expect(actualLinksSources).toEqual(expectedLinksSources);
   expect(actualScriptSources).toEqual(expectedScriptsSources);
