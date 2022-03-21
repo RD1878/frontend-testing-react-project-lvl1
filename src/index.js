@@ -40,7 +40,7 @@ const saveFile = async (source, url, filePath) => {
   }
 };
 
-export default async (url, dirPath = cwd()) => {
+const pageLoaderFunc = async (url, dirPath = cwd()) => {
   try {
     const response = await axios.get(url);
     log('Request URL:', response.config.url);
@@ -133,3 +133,5 @@ export default async (url, dirPath = cwd()) => {
     );
   }
 };
+
+export default pageLoaderFunc;
