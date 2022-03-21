@@ -25,7 +25,7 @@ const getScopes = (sources, baseUrl) => {
 };
 const setExpectedSourcesData = (file, selector, arraySources, arrayFilenames, baseUrl) => {
   const $ = cheerio.load(file);
-  $(selector).each((function (i) {
+  $(selector).each((function formatter(i) {
     const source = $(this).attr(selector === 'link' ? 'href' : 'src');
     const isInValidSource = isValidHttpUrl(source) && getOriginFromUrl(source) !== baseUrl;
     // eslint-disable-next-line no-param-reassign
@@ -37,7 +37,7 @@ const setExpectedSourcesData = (file, selector, arraySources, arrayFilenames, ba
 
 const setHtmlSources = (file, selector, arraySources) => {
   const $ = cheerio.load(file);
-  $(selector).each((function (i) {
+  $(selector).each((function formatter(i) {
     // eslint-disable-next-line no-param-reassign
     arraySources[i] = $(this).attr(selector === 'link' ? 'href' : 'src');
   }));
