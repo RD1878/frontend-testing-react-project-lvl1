@@ -21,6 +21,9 @@
   "bin": {
     "page-loader": "bin/page-loader.js"
   },
+  "jest": {
+    "testPathIgnorePatterns": ["/node_modules/", "__tests__/__fixtures__"]
+  },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
     "@babel/core": "^7.17.5",
