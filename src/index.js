@@ -51,6 +51,8 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
     if (response.status === 200) {
       if (!fs.existsSync(dirPath)) {
         await fs.promises.mkdir(dirPath, { recursive: true });
+      } else if (!fs.lstatSync(dirPath).isDirectory()) {
+        throw new Error('Dirpath Error');
       }
 
       const htmlFileName = `${convertUrl(url)}.html`;
