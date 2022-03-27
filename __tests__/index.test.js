@@ -120,7 +120,7 @@ test('check with 500 error', async () => {
 });
 
 test('check with file system error', async () => {
-  const failDir = '/fail_Dir';
+  const failDir = '/fail_Dir.js';
   nock(baseUrl)
     .get(resourcesData.html.uri)
     .reply(200);
