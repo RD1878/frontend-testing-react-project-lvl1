@@ -101,16 +101,28 @@ test('check files', async () => {
   expect(actualFlattenHtmlValue).toEqual(expectedFile);
 });
 
-test('check with request error', async () => {
-  const responseCode = 404;
+test('check with 404 error', async () => {
+  const failString = 'not_found';
+  nock(baseUrl)
+    .get(`/${failString}`)
+    .reply(404);
+  const failUrl = new URL(`/${failString}`, baseUrl).toString();
+  await expect(pageLoader(failUrl, dirPath)).rejects.toThrow(failString);
+});
+
+test('check with 500 error', async () => {
+  const failString = 'internal_server_error';
+  nock(baseUrl)
+    .get(`/${failString}`)
+    .reply(500);
+  const failUrl = new URL(`/${failString}`, baseUrl).toString();
+  await expect(pageLoader(failUrl, dirPath)).rejects.toThrow(failString);
+});
+
+test('check with file system error', async () => {
+  const failDir = '/fail_Dir';
   nock(baseUrl)
     .get(resourcesData.html.uri)
-    .reply(responseCode);
-  await expect(pageLoader(url, dirPath)).rejects.toThrow(`
-      ERROR
-      Message: Request failed with status code ${responseCode};
-      Code: undefined;
-      URL: ${baseUrl}${resourcesData.html.uri};
-      Response code: ${responseCode}
-      `);
+    .reply(200);
+  await expect(pageLoader(url, failDir)).rejects.toThrow('ERROR');
 });
