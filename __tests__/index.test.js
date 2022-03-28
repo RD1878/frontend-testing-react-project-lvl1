@@ -96,9 +96,9 @@ test('check files', async () => {
   const actualFlattenHtmlValue = getFlattenHtml(actualHtmlFileValue);
   const actualSourcesFiles = await fs.promises.readdir(actualSourcesDirPath);
   const actualSourcesFilesValues = await Promise.all(actualSourcesFiles.map((file) => fs.promises.readFile(path.join(actualSourcesDirPath, file), 'utf-8')));
-  expect(actualSourcesFilesValues).toEqual(expectedSourcesFilesValues);
-  expect(actualHtmlFilePath).toEqual(expectedHtmlFilePath);
-  expect(actualFlattenHtmlValue).toEqual(expectedFile);
+  await expect(actualSourcesFilesValues).toEqual(expectedSourcesFilesValues);
+  await expect(actualHtmlFilePath).toEqual(expectedHtmlFilePath);
+  await expect(actualFlattenHtmlValue).toEqual(expectedFile);
 });
 
 test('check with 404 error', async () => {
