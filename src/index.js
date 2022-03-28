@@ -66,8 +66,8 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
       const htmlPath = path.join(dirPath, htmlFileName);
       const originOfUrl = getOriginFromUrl(url);
 
-      const $ = cheerio.load(response.data);
-      $('img').map(function imageFormatter() {
+      const $ = await cheerio.load(response.data);
+      await $('img').map(function imageFormatter() {
         const source = $(this).attr('src');
 
         if (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) {
@@ -84,7 +84,7 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
         return $(this).attr('src', formattedSrc);
       });
 
-      $('link').map(function linkFormatter() {
+      await $('link').map(function linkFormatter() {
         const source = $(this).attr('href');
 
         if (!source || (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
@@ -101,7 +101,7 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
         return $(this).attr('href', formattedSrc);
       });
 
-      $('script').map(function scriptFormatter() {
+      await $('script').map(function scriptFormatter() {
         const source = $(this).attr('src');
         if (!source || (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
           return $(this).attr('src', source);
