@@ -67,7 +67,7 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
       const originOfUrl = getOriginFromUrl(url);
 
       const $ = await cheerio.load(response.data);
-      await $('img').map(function imageFormatter() {
+      await Promise.all($('img').map(async function imageFormatter() {
         const source = $(this).attr('src');
 
         if (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) {
@@ -78,13 +78,13 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
 
         const formattedSrc = getFormattedSrc(filesDirectoryName, url, value, extension);
         const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
-        saveFile(source, url, filePath);
+        await saveFile(source, url, filePath);
         log('File downloaded to:', filePath.path);
 
         return $(this).attr('src', formattedSrc);
-      });
+      }));
 
-      await $('link').map(function linkFormatter() {
+      await Promise.all($('link').map(async function linkFormatter() {
         const source = $(this).attr('href');
 
         if (!source || (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
@@ -95,13 +95,13 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
 
         const formattedSrc = getFormattedSrc(filesDirectoryName, url, value, extension);
         const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
-        saveFile(source, url, filePath);
+        await saveFile(source, url, filePath);
         log('File downloaded to:', filePath.path);
 
         return $(this).attr('href', formattedSrc);
-      });
+      }));
 
-      await $('script').map(function scriptFormatter() {
+      await Promise.all($('script').map(async function scriptFormatter() {
         const source = $(this).attr('src');
         if (!source || (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
           return $(this).attr('src', source);
@@ -111,11 +111,11 @@ const pageLoaderFunc = async (url, dirPath = cwd()) => {
 
         const formattedSrc = getFormattedSrc(filesDirectoryName, url, value, extension);
         const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
-        saveFile(source, url, filePath);
+        await saveFile(source, url, filePath);
         log('File downloaded to:', filePath.path);
 
         return $(this).attr('src', formattedSrc);
-      });
+      }));
 
       const resultHtml = $.html();
       await fs.promises.writeFile(htmlPath, resultHtml);
