@@ -4,7 +4,7 @@
   "description": "Testing project 1",
   "main": "src/index.js",
   "scripts": {
-    "test": "npx jest --bail",
+    "test": "jest --bail",
     "test:debug": "DEBUG=nock.* npx jest"
   },
   "repository": {
@@ -22,7 +22,10 @@
     "page-loader": "bin/page-loader.js"
   },
   "jest": {
-    "testPathIgnorePatterns": ["/node_modules/", "__tests__/__fixtures__"]
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "__tests__/__fixtures__"
+    ]
   },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
@@ -48,6 +51,7 @@
     "cheerio": "^1.0.0-rc.10",
     "commander": "^9.0.0",
     "debug": "^4.3.3",
+    "lodash": "^4.17.21",
     "process": "^0.11.10"
   }
 }

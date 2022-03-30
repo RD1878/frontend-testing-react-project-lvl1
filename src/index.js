@@ -1,142 +1,91 @@
-import fs from 'fs';
-import path from 'path';
+// @ts-check
+
+import { promises as fs } from 'fs';
 import axios from 'axios';
+import { URL } from 'url';
+import _ from 'lodash';
+import path from 'path';
 import cheerio from 'cheerio';
 import debug from 'debug';
-import 'axios-debug-log';
-import { cwd } from 'process';
-import convertUrl from './utils/convertUrl.js';
-import getPathFromUrl from './utils/getPathFromUrl.js';
-import formatPath from './utils/formatPath.js';
-import getOriginFromUrl from './utils/getOriginFromUrl.js';
-import isValidHttpUrl from './utils/isValidHttpUrl.js';
 
-const appName = 'pageLoader';
-const log = debug(appName);
-log('debugging %o', appName);
+import { urlToDirname, urlToFilename } from './utils.js';
 
-const saveFile = async (source, url, filePath) => {
-  try {
-    const res = await axios({
-      method: 'GET',
-      url: source,
-      baseURL: `${getOriginFromUrl(url)}`,
-      responseType: 'stream',
+// В логировании главное - данные, которые помогают отлаживать
+const log = debug('page-loader');
+
+// Диспетчеризация
+const attributeMapping = {
+  link: 'href',
+  script: 'src',
+  img: 'src',
+};
+
+// Обратите внимание на цикломатическую сложность,
+// здесь есть один фильтр и ни одной условной конструкции
+const prepareAssets = (website, baseDirname, html) => {
+  const $ = cheerio.load(html, { decodeEntities: false });
+  const assets = [];
+  Object.entries(attributeMapping).forEach(([tagName, attrName]) => {
+    const $elements = $(tagName).toArray();
+    // Очень важная часть: пайплайн, очистка от нелокальных ресурсов
+    const elementsWithUrls = $elements.map((element) => $(element))
+      .filter(($element) => $element.attr(attrName))
+      .map(($element) => ({ $element, url: new URL($element.attr(attrName), website) }))
+      .filter(({ url }) => url.origin === website);
+
+    elementsWithUrls.forEach(({ $element, url }) => {
+      const slug = urlToFilename(`${url.hostname}${url.pathname}`);
+      const filepath = path.join(baseDirname, slug);
+      assets.push({ url, filename: slug });
+      $element.attr(attrName, filepath);
     });
-    await res.data.pipe(filePath);
-  } catch (e) {
-    const {
-      code, response, config, message,
-    } = e;
-    throw new Error(
-      `
-      ERROR
-      Message: ${message};
-      Code: ${code};
-      URL: ${config?.url};
-      Response code: ${response?.status}
-      `,
-    );
-  }
+  });
+
+  return { html: $.html(), assets };
 };
 
-const getFormattedSrc = (filesDirectoryName, url, value, extension) => `${filesDirectoryName}/${convertUrl(getOriginFromUrl(url))}${formatPath(value)}.${extension ?? 'html'}`;
+const downloadAsset = (dirname, { url, filename }) => (
+  // Все данные качаются как бинарные, это позволяет одинаково качать и картинки и текст
+  // Скачка и сохранение ускоряют процесс. Можно сначала все скачать, а потом все сохранять,
+  // но это не эффективно. Тут это важно, потому что данные качаются медленно.
+  axios.get(url.toString(), { responseType: 'arraybuffer' })
+    .then((response) => {
+      const fullPath = path.join(dirname, filename);
+      return fs.writeFile(fullPath, response.data);
+    })
+);
 
-const pageLoaderFunc = async (url, dirPath = cwd()) => {
-  try {
-    const response = await axios.get(url);
-    log('Request URL:', response.config.url);
-    log('Request method:', response.request.method);
-    log('Response status:', response.status);
-    if (response.status === 200) {
-      if (!fs.existsSync(dirPath)) {
-        await fs.promises.mkdir(dirPath, { recursive: true });
-      } else if (!fs.lstatSync(dirPath).isDirectory()) {
-        throw new Error('Dirpath Error');
-      }
+export default (pageUrl, outputDirname = '') => {
+  log('url', pageUrl);
+  log('output', outputDirname);
+  const url = new URL(pageUrl);
+  const slug = `${url.hostname}${url.pathname}`;
+  const filename = urlToFilename(slug);
+  const fullOutputDirname = path.resolve(process.cwd(), outputDirname);
+  const fullOutputFilename = path.join(fullOutputDirname, filename);
+  const assetsDirname = urlToDirname(slug);
+  const fullOutputAssetsDirname = path.join(fullOutputDirname, assetsDirname);
 
-      const htmlFileName = `${convertUrl(url)}.html`;
-      const filesDirectoryName = `${convertUrl(url)}_files`;
-      const filesPath = path.join(dirPath, filesDirectoryName);
+  let data;
+  const promise = axios.get(pageUrl)
+    .then((response) => {
+      data = prepareAssets(url.origin, assetsDirname, response.data);
+      log('create (if not exists) directory for assets', fullOutputAssetsDirname);
+      return fs.access(fullOutputAssetsDirname)
+        .catch(() => fs.mkdir(fullOutputAssetsDirname));
+    })
+    .then(() => {
+      log('write html file', fullOutputFilename);
+      return fs.writeFile(fullOutputFilename, data.html);
+    })
+    .then(() => {
+      const tasks = data.assets.map((asset) => {
+        log('asset', asset.url.toString(), asset.filename);
+        return downloadAsset(fullOutputAssetsDirname, asset).catch(_.noop);
+      });
+      return Promise.all(tasks);
+    })
+    .then(() => ({ filepath: fullOutputFilename }));
 
-      if (!fs.existsSync(filesPath)) {
-        await fs.promises.mkdir(filesPath);
-      }
-
-      const htmlPath = path.join(dirPath, htmlFileName);
-      const originOfUrl = getOriginFromUrl(url);
-
-      const $ = await cheerio.load(response.data);
-      await Promise.all($('img').map(async function imageFormatter() {
-        const source = $(this).attr('src');
-
-        if (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) {
-          return $(this).attr('src', source);
-        }
-
-        const [value, extension] = getPathFromUrl(source).split('.');
-
-        const formattedSrc = getFormattedSrc(filesDirectoryName, url, value, extension);
-        const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
-        await saveFile(source, url, filePath);
-        log('File downloaded to:', filePath.path);
-
-        return $(this).attr('src', formattedSrc);
-      }));
-
-      await Promise.all($('link').map(async function linkFormatter() {
-        const source = $(this).attr('href');
-
-        if (!source || (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
-          return $(this).attr('href', source);
-        }
-
-        const [value, extension] = getPathFromUrl(source).split('.');
-
-        const formattedSrc = getFormattedSrc(filesDirectoryName, url, value, extension);
-        const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
-        await saveFile(source, url, filePath);
-        log('File downloaded to:', filePath.path);
-
-        return $(this).attr('href', formattedSrc);
-      }));
-
-      await Promise.all($('script').map(async function scriptFormatter() {
-        const source = $(this).attr('src');
-        if (!source || (isValidHttpUrl(source) && (getOriginFromUrl(source) !== originOfUrl)) || (!isValidHttpUrl(source) && source.match(/^\/\//))) {
-          return $(this).attr('src', source);
-        }
-
-        const [value, extension] = getPathFromUrl(source).split('.');
-
-        const formattedSrc = getFormattedSrc(filesDirectoryName, url, value, extension);
-        const filePath = fs.createWriteStream(path.join(dirPath, formattedSrc));
-        await saveFile(source, url, filePath);
-        log('File downloaded to:', filePath.path);
-
-        return $(this).attr('src', formattedSrc);
-      }));
-
-      const resultHtml = $.html();
-      await fs.promises.writeFile(htmlPath, resultHtml);
-      log('Page saved to:', htmlPath);
-      return { filepath: htmlPath };
-    }
-    throw new Error('Application error');
-  } catch (e) {
-    const {
-      code, response, config, message,
-    } = e;
-    throw new Error(
-      `
-      ERROR
-      Message: ${message};
-      Code: ${code};
-      URL: ${config?.url};
-      Response code: ${response?.status}
-      `,
-    );
-  }
+  return promise;
 };
-
-export default pageLoaderFunc;

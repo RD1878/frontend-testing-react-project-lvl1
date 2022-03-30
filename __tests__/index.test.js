@@ -10,6 +10,8 @@ const getFlattenHtml = (htmlValue) => htmlValue.replace(/\s*/g, '');
 const baseUrl = 'https://ru.hexlet.io';
 const responseHtmlFileName = 'responsePage.html';
 const savedHtmlFileName = 'savedPage.html';
+const scope = nock(baseUrl).persist();
+const errorNumbers = [404, 500];
 
 const resourcesData = {
   html: {
@@ -101,28 +103,19 @@ test('check files', async () => {
   await expect(actualFlattenHtmlValue).toEqual(expectedFile);
 });
 
-test('check with 404 error', async () => {
-  const failString = 'not_found';
-  nock(baseUrl)
-    .get(`/${failString}`)
-    .reply(404);
-  const failUrl = new URL(`/${failString}`, baseUrl).toString();
-  await expect(pageLoader(failUrl, dirPath)).rejects.toThrow(failString);
-});
-
-test('check with 500 error', async () => {
-  const failString = 'internal_server_error';
-  nock(baseUrl)
-    .get(`/${failString}`)
-    .reply(500);
-  const failUrl = new URL(`/${failString}`, baseUrl).toString();
-  await expect(pageLoader(failUrl, dirPath)).rejects.toThrow(failString);
+test.each(errorNumbers)('check with 404/500 error', async (code) => {
+  nock(baseUrl).get(`/${code}`).reply(code);
+  const failUrl = new URL(`/${code}`, baseUrl).toString();
+  await expect(pageLoader(failUrl, dirPath))
+    .rejects.toThrow(new RegExp(code));
 });
 
 test('check with file system error', async () => {
-  const failDir = '/fail_Dir.js';
-  nock(baseUrl)
+  const failDir = '/fail_Dir';
+  const file = getFixturePath('nodejs.png');
+  scope
     .get(resourcesData.html.uri)
     .reply(200);
-  await expect(pageLoader(url, failDir)).rejects.toThrow('ERROR');
+  await expect(pageLoader(url, failDir)).rejects.toThrow('ENOENT');
+  await expect(pageLoader(url, file)).rejects.toThrow('ENOTDIR');
 });
