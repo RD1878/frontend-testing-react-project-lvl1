@@ -21,28 +21,24 @@ const errorNumbers = [404, 500];
 
 const resourcesData = [
   {
-    name: 'linkCss',
     uri: '/assets',
     fileName: 'application.css',
     expectedFileName: 'ru-hexlet-io-assets-application.css',
     pathFile: '/assets/application.css',
   },
   {
-    name: 'linkHtml',
     uri: '/courses',
     fileName: 'responsePage.html',
     expectedFileName: 'ru-hexlet-io-courses.html',
     pathFile: '/courses',
   },
   {
-    name: 'image',
     uri: '/assets/professions',
     fileName: 'nodejs.png',
     expectedFileName: 'ru-hexlet-io-assets-professions-nodejs.png',
     pathFile: '/assets/professions/nodejs.png',
   },
   {
-    name: 'script',
     uri: '/packs/js',
     fileName: 'runtime.js',
     expectedFileName: 'ru-hexlet-io-packs-js-runtime.js',
@@ -85,18 +81,17 @@ describe('positive tests', () => {
 
   test.each(resourcesData)('check sources values', async ({ fileName, expectedFileName }) => {
     const index = resourcesData.findIndex((item) => item.fileName === fileName);
-    const value = await getFileValue(path.join(__dirname, '__fixtures__'), fileName);
+    const expectedValue = await getFileValue(path.join(__dirname, '__fixtures__'), fileName);
     scope
       .get(uri)
       .reply(200, responseFile)
       .get(resourcesData[index].pathFile)
-      .reply(200, value);
+      .reply(200, expectedValue);
     await pageLoader(url, dirPath);
     const actualFiles = await fs.promises.readdir(dirPath);
     const actualSourcesDir = actualFiles.find((file) => file.match(/files$/));
     const actualSourcesDirPath = path.join(dirPath, actualSourcesDir);
     const actualValue = await getFileValue(actualSourcesDirPath, expectedFileName);
-    const expectedValue = await getFileValue(path.join(__dirname, '__fixtures__'), fileName);
     await expect(actualValue).toEqual(expectedValue);
   });
 });
